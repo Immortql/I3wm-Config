@@ -1,0 +1,68 @@
+#!/bin/bash
+
+#########################################
+# Created by: Cadehlinha                #
+# Github: https://github.com/Cadehlinha #
+#########################################
+
+# Kill any instances of our mpv wallpaper
+pkill -f animated-wallpaper
+
+# Set the rofi theme
+theme="$HOME/.config/i3/polybar/scripts/rofi/launcher.rasi"
+
+# Set the wallpaper directory
+wallpaper_dir="$HOME/.config/i3/wallpapers"
+
+# Use Rofi to display the wallpaper type selection menu
+selected_type=$(echo -e "Static Wallpaper\nAnimated Wallpaper" | rofi -dmenu -i -p "Select Wallpaper Type" -theme $theme)
+if [[ -z $selected_type ]]; then
+    exit 0
+fi
+
+if [[ $selected_type == "Static Wallpaper" ]]; then
+    # Append "static" to the main wallpaper directory
+    wallpaper_dir="$wallpaper_dir/static"
+    
+    # Get the list of wallpapers in the directory
+    wallpapers=$(find "$wallpaper_dir" -type f -printf "%f\n")
+
+    # Use Rofi to display the wallpaper selection menu
+    selected_wallpaper=$(echo "$wallpapers" | rofi -dmenu -filebrowser -i -p "Select Wallpaper" -theme $theme)
+    if [[ -z $selected_wallpaper ]]; then
+        exit 0
+    fi
+
+    # Set the feh options
+    feh_options=(
+        "--bg-scale"
+        "--bg-fill"
+        "--bg-tile"
+        "--bg-max"
+        "--bg-center"
+    )
+
+    # Use Rofi to display the feh options menu
+    selected_option=$(printf '%s\n' "${feh_options[@]}" | rofi -dmenu -i -p "Select feh Option" -theme $theme)
+    if [[ -z $selected_option ]]; then
+        exit 0
+    fi
+
+    # Set the selected wallpaper using feh with the chosen option
+    feh "$selected_option" "$wallpaper_dir/$selected_wallpaper"
+elif [[ $selected_type == "Animated Wallpaper" ]]; then
+    # Append "animated" to the main wallpaper directory
+    wallpaper_dir="$wallpaper_dir/animated"
+    
+    # Use Rofi to display the animated wallpaper selection menu
+    selected_wallpaper=$(find "$wallpaper_dir" -type f -printf "%f\n" | rofi -dmenu -i -p "Select Animated Wallpaper" -theme $theme)
+    if [[ -z $selected_wallpaper ]]; then
+        exit 0
+    fi
+
+    # Path to the animated wallpaper script
+    animated_script="$HOME/.config/i3/scripts/video-wallpaper"
+    
+    # Execute the animated wallpaper script with the selected file
+    "$animated_script" "$wallpaper_dir/$selected_wallpaper"
+fi

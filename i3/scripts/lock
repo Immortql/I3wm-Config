@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+#################################
+# Created by: Cadehlinha        #
+# https://github.com/Cadehlinha #
+#################################
+
+main() {
+  local lock_img="$1"
+  local snapshot_cmd="$2"
+  local down_scale_factor="$3"
+  local up_scale_factor="$4"
+
+  cleanup() {
+    rm -f "$lock_img"
+  }
+
+  trap cleanup EXIT
+
+  check_dependencies() {
+    local dependencies=("scrot" "convert" "i3lock")
+    local missing_dependencies=()
+
+    for dep in "${dependencies[@]}"; do
+      if ! command -v "$dep" >/dev/null; then
+        missing_dependencies+=("$dep")
+      fi
+    done
+
+    if [[ ${#missing_dependencies[@]} -gt 0 ]]; then
+      echo "Missing dependencies: ${missing_dependencies[*]}" >&2
+      exit 1
+    fi
+  }
+
+  check_dependencies
+
+  $snapshot_cmd
+  convert "$lock_img" -scale "$down_scale_factor" -scale "$up_scale_factor" "$lock_img"
+  i3lock -i "$lock_img"
+  rm $lock_img
+}
+
+# Define the variables
+LOCK_IMG=/tmp/lock.png
+SNAPSHOT_CMD="scrot $LOCK_IMG"
+DOWN_SCALE_FACTOR="10%" 
+UP_SCALE_FACTOR="1000%"
+
+# Call the main function with the necessary variables
+main "$LOCK_IMG" "$SNAPSHOT_CMD" "$DOWN_SCALE_FACTOR" "$UP_SCALE_FACTOR"

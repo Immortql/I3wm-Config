@@ -1,0 +1,28 @@
+#!/bin/bash
+
+#########################################
+# Created by: Cadehlinha                #
+# Github: https://github.com/Cadehlinha #
+#########################################
+
+# Check if the video file argument is provided
+if [ -z "$1" ]; then
+    echo "Missing mp4 file path"
+    exit 1
+fi
+
+# Get the absolute path of the video file
+video_file=$(realpath "$1")
+
+# Get the screen resolution
+resolution=$(xdotool getdisplaygeometry)
+
+# Extract the width and height from the resolution
+width=$(echo "$resolution" | awk '{print $1}')
+height=$(echo "$resolution" | awk '{print $2}')
+
+# Build the scaled command
+scaled_command="xwinwrap -g ${width}x${height} -ni -s -nf -b -un -ov -fdt -argb -- mpv --title="animated-wallpaper" --mute=yes --no-audio --no-osc --no-osd-bar --quiet --screen=0 -wid WID --loop --panscan=1 \"$video_file\""
+
+# Execute the scaled command
+eval "$scaled_command"

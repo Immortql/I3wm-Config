@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+#################################
+# Created by: Cadehlinha        #
+# https://github.com/Cadehlinha #
+#################################
+
+show_menu() {
+    local options=("Take screenshot now" "Schedule screenshot in 5 seconds" "Take screenshot of selected area" "Take screenshot of active window" "Exit")
+    local selection=$(printf '%s\n' "${options[@]}" | rofi -dmenu -p "Screenshot Options:" -format i -theme ~/.config/i3/polybar/scripts/rofi/launcher.rasi)
+    case $selection in
+        0)
+            ~/.config/i3/scripts/screenshot --now
+            ;;
+        1)
+            ~/.config/i3/scripts/screenshot --in5
+            ;;
+        2)
+            ~/.config/i3/scripts/screenshot --sel
+            ;;
+        3)
+            ~/.config/i3/scripts/screenshot --active
+            ;;
+        4)
+            exit 0
+            ;;
+        *)
+            ;;
+    esac
+}
+
+# Call the show_menu function to display the Rofi menu
+show_menu
