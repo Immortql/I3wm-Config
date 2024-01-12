@@ -36,7 +36,15 @@ Please note: Some packages used in this config may not be installed on your syst
 -   xclip
 -   xdotool
 
+```shell
+sudo pacman -S --needed calc dmenu dunst feh firefox i3blocks i3lock i3status i3-wm imagemagick mpd mpv picom polybar python-pywal rofi scrot thunar xfce4-terminal xclip xdotool
+```
+
 (these are in the AUR)
 -   autotiling
 -   networkmanager-dmenu-git
--   xwinwrap-0.9-bin 
+-   xwinwrap-0.9-bin
+
+```shell
+yay -S --needed autotiling networkmanager-dmenu-git xwinwrap-0.9-bin 
+```
