@@ -1,0 +1,13 @@
+#!/bin/bash
+
+theme=$(cat "$HOME/.config/i3/.theme")
+theme_dir="$HOME/.config/i3/polybar/themes/$theme/rofi/networkmenu.rasi"
+
+# Check if the .rasi file exists
+if [ ! -f "$theme_dir" ]; then
+    sed -E -i "s|^(dmenu_command = rofi -no-config -no-lazy-grab -show drun -modi drun).*|dmenu_command = rofi -no-config -no-lazy-grab -show drun -modi drun|" ~/.config/i3/scripts/network-manager/config.ini
+else
+    sed -E -i "s|^(dmenu_command = rofi -no-config -no-lazy-grab -show drun -modi drun).*|dmenu_command = rofi -no-config -no-lazy-grab -show drun -modi drun -theme $theme_dir|" ~/.config/i3/scripts/network-manager/config.ini
+fi
+
+~/.config/i3/scripts/network-manager/nm-dmenu

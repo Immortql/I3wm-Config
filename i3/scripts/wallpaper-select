@@ -1,21 +1,22 @@
 #!/bin/bash
 
-#########################################
-# Created by: Cadehlinha                #
-# Github: https://github.com/Cadehlinha #
-#########################################
-
-# Kill any instances of our mpv wallpaper
+# Kill any instances of mpv wallpaper
 pkill -f animated-wallpaper
 
-# Set the rofi theme
-theme="$HOME/.config/i3/polybar/scripts/rofi/launcher.rasi"
+# Read the theme directory from the .theme file
+theme=$(cat "$HOME/.config/i3/.theme")
+launcher_file="$HOME/.config/i3/polybar/themes/$theme/rofi/launcher.rasi"
 
 # Set the wallpaper directory
 wallpaper_dir="$HOME/.config/i3/wallpapers"
 
 # Use Rofi to display the wallpaper type selection menu
-selected_type=$(echo -e "Static Wallpaper\nAnimated Wallpaper" | rofi -dmenu -i -p "Select Wallpaper Type" -theme $theme)
+if [[ -f "$launcher_file" ]]; then
+    selected_type=$(echo -e "Static Wallpaper\nAnimated Wallpaper" | rofi -dmenu -i -p "Select Wallpaper Type" -theme "$launcher_file")
+else
+    selected_type=$(echo -e "Static Wallpaper\nAnimated Wallpaper" | rofi -dmenu -i -p "Select Wallpaper Type")
+fi
+
 if [[ -z $selected_type ]]; then
     exit 0
 fi
@@ -23,12 +24,17 @@ fi
 if [[ $selected_type == "Static Wallpaper" ]]; then
     # Append "static" to the main wallpaper directory
     wallpaper_dir="$wallpaper_dir/static"
-    
+
     # Get the list of wallpapers in the directory
     wallpapers=$(find "$wallpaper_dir" -type f -printf "%f\n")
 
     # Use Rofi to display the wallpaper selection menu
-    selected_wallpaper=$(echo "$wallpapers" | rofi -dmenu -filebrowser -i -p "Select Wallpaper" -theme $theme)
+    if [[ -f "$launcher_file" ]]; then
+        selected_wallpaper=$(echo "$wallpapers" | rofi -dmenu -filebrowser -i -p "Select Wallpaper" -theme "$launcher_file")
+    else
+        selected_wallpaper=$(echo "$wallpapers" | rofi -dmenu -filebrowser -i -p "Select Wallpaper")
+    fi
+
     if [[ -z $selected_wallpaper ]]; then
         exit 0
     fi
@@ -43,7 +49,12 @@ if [[ $selected_type == "Static Wallpaper" ]]; then
     )
 
     # Use Rofi to display the feh options menu
-    selected_option=$(printf '%s\n' "${feh_options[@]}" | rofi -dmenu -i -p "Select feh Option" -theme $theme)
+    if [[ -f "$launcher_file" ]]; then
+        selected_option=$(printf '%s\n' "${feh_options[@]}" | rofi -dmenu -i -p "Select feh Option" -theme "$launcher_file")
+    else
+        selected_option=$(printf '%s\n' "${feh_options[@]}" | rofi -dmenu -i -p "Select feh Option")
+    fi
+
     if [[ -z $selected_option ]]; then
         exit 0
     fi
@@ -53,16 +64,21 @@ if [[ $selected_type == "Static Wallpaper" ]]; then
 elif [[ $selected_type == "Animated Wallpaper" ]]; then
     # Append "animated" to the main wallpaper directory
     wallpaper_dir="$wallpaper_dir/animated"
-    
+
     # Use Rofi to display the animated wallpaper selection menu
-    selected_wallpaper=$(find "$wallpaper_dir" -type f -printf "%f\n" | rofi -dmenu -i -p "Select Animated Wallpaper" -theme $theme)
+    if [[ -f "$launcher_file" ]]; then
+        selected_wallpaper=$(find "$wallpaper_dir" -type f -printf "%f\n" | rofi -dmenu -i -p "Select Animated Wallpaper" -theme "$launcher_file")
+    else
+        selected_wallpaper=$(find "$wallpaper_dir" -type f -printf "%f\n" | rofi -dmenu -i -p "Select Animated Wallpaper")
+    fi
+
     if [[ -z $selected_wallpaper ]]; then
         exit 0
     fi
 
     # Path to the animated wallpaper script
     animated_script="$HOME/.config/i3/scripts/video-wallpaper"
-    
+
     # Execute the animated wallpaper script with the selected file
     "$animated_script" "$wallpaper_dir/$selected_wallpaper"
 fi

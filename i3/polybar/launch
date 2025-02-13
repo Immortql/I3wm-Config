@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+
+DIR="$HOME/.config/i3/polybar"
+
+
+declare -A themes=(
+  ["--docky"]="docky"
+  ["--forest"]="forest"
+  ["--grayblocks"]="grayblocks"
+  ["--hack"]="hack"
+  ["--material"]="material"
+)
+
+
+launch_bar() {
+  killall -q polybar
+  while pgrep -u $UID -x polybar >/dev/null; do sleep 1; done
+
+  polybar -q top -c "$DIR/themes/$theme/config.ini" &
+  polybar -q bottom -c "$DIR/themes/$theme/config.ini" &
+}
+
+
+handle_invalid_option() {
+  echo "Invalid option"
+  echo "Available options:"
+  column_width=15
+  num_columns=4
+  count=0
+  for option in "${!themes[@]}"; do
+    printf "%-${column_width}s" "$option"
+    ((count++))
+    if ((count % num_columns == 0)); then
+      echo
+    fi
+  done
+  echo
+}
+
+
+if [[ -z $1 ]]; then
+  handle_invalid_option
+  exit 1
+elif [[ ${themes[$1]} ]]; then
+  theme=${themes[$1]}
+else
+  handle_invalid_option
+  exit 1
+fi
+
+
+echo "$theme" > ~/.config/i3/.theme
+launch_bar

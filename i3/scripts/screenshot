@@ -2,11 +2,11 @@
 
 ########################
 # Original: gh0stzk    #
-# Modified: Cadehlinha #
+# Modified: Floramene  #
 ########################
 
 timestamp=$(date +%d_%m_%Y-%I-%M-%S)
-dir="$(xdg-user-dir PICTURES)/ScreenShots"
+dir=~/Pictures/ScreenShots
 filename="$dir/Screenshot-${timestamp}.png"
 
 [ -d "$dir" ] || mkdir -p "$dir"
@@ -17,33 +17,33 @@ show_notification() {
 }
 
 countdown() {
-	for sec in $(seq "$1" -1 1); do
-		dunstify -t 1000 --replace=699 "Taking shot in : $sec"
-		sleep 1
-	done
+    for sec in $(seq "$1" -1 1); do
+        dunstify -t 1000 --replace=699 "Taking shot in : $sec"
+        sleep 1
+    done
 }
 
 take_screenshot() {
-    scrot "$filename"
+    maim "$filename"
     xclip -selection clipboard -t image/png -i "$filename"
     show_notification "$filename" "$1"
 }
 
 case $1 in
-	--now)
-		take_screenshot "Screenshot saved and copied to clipboard";;
-	--in5)
-		countdown 5
-		take_screenshot "Scheduled capture taken after 10 seconds and copied to clipboard";;
-	--sel)
+    --now)
+        take_screenshot "Screenshot saved and copied to clipboard";;
+    --in5)
+        countdown 5
+        take_screenshot "Scheduled capture taken after 10 seconds and copied to clipboard";;
+    --sel)
         sleep 0.5
-		scrot -s "$filename"
-		xclip -selection clipboard -t image/png -i "$filename"
-		show_notification "$filename" "Screenshot of selected area saved and copied to clipboard";;
-	--active)
-		scrot -u -e "xdotool getactivewindow" "$filename"
-		xclip -selection clipboard -t image/png -i "$filename"
-		show_notification "$filename" "Screenshot of active window saved and copied to clipboard";;
-	*)
-		take_screenshot "Screenshot saved and copied to clipboard";;
+        maim -s "$filename"
+        xclip -selection clipboard -t image/png -i "$filename"
+        show_notification "$filename" "Screenshot of selected area saved and copied to clipboard";;
+    --active)
+        maim -i "$(xdotool getactivewindow)" "$filename"
+        xclip -selection clipboard -t image/png -i "$filename"
+        show_notification "$filename" "Screenshot of active window saved and copied to clipboard";;
+    *)
+        take_screenshot "Screenshot saved and copied to clipboard";;
 esac

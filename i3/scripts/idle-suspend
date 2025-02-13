@@ -1,0 +1,64 @@
+#!/bin/bash
+
+#LOG_FILE="$HOME/idle_monitor.log"
+#exec > >(tee -a "$LOG_FILE") 2>&1
+
+IDLE_TIME_LIMIT=$((15 * 60 * 1000))  # 15 minutes in milliseconds
+LOCK_SCRIPT="$HOME/.config/i3/scripts/lock"
+COOLDOWN=$((2 * 60))  # 2 minutes cooldown in seconds
+LAST_SUSPEND=0
+
+echo "Starting idle time monitor script..."
+echo "Idle time limit set to $IDLE_TIME_LIMIT milliseconds."
+
+while true; do
+    IDLE_TIME=$(xprintidle)
+    if [ -z "$IDLE_TIME" ] || ! [[ "$IDLE_TIME" =~ ^[0-9]+$ ]]; then
+        echo "$(date) - ERROR: xprintidle returned invalid value!"
+        sleep 5
+        continue
+    fi
+    echo "$(date) - Current idle time: $IDLE_TIME ms"
+
+    if [ "$IDLE_TIME" -ge "$IDLE_TIME_LIMIT" ]; then
+        echo "$(date) - Idle time exceeded!"
+
+        # Make sure not to suspend if watching a video or something
+        if playerctl --player=firefox status | grep -q "Playing"; then
+            echo "$(date) - Video detected as playing. Resetting idle timer."
+            sleep 10
+            continue
+        fi
+
+        # Prevent repeated suspensions in quick succession
+        CURRENT_TIME=$(date +%s)
+        if [ "$((CURRENT_TIME - LAST_SUSPEND))" -lt "$COOLDOWN" ]; then
+            echo "$(date) - Recently suspended. Waiting..."
+            sleep 10
+            continue
+        fi
+
+        # Check if i3lock is running
+        if pgrep -x "i3lock" > /dev/null; then
+            echo "$(date) - i3lock is already running. Suspending system..."
+        else
+            echo "$(date) - i3lock is not running. Locking system first..."
+            if [ -x "$LOCK_SCRIPT" ]; then
+                "$LOCK_SCRIPT" &
+                sleep 2 # give time to lock before suspend
+            else
+                echo "$(date) - Lock script not found or not executable! Suspending without lock."
+            fi
+        fi
+
+        # Suspend after locking (or if already locked)
+        systemctl suspend
+        LAST_SUSPEND=$(date +%s)
+    else
+        echo "$(date) - System active. Waiting..."
+    fi
+
+    # Dynamically adjust sleep time to optimize CPU usage
+    sleep_time=$(( (IDLE_TIME_LIMIT - IDLE_TIME) / 1000 ))
+    sleep $(( sleep_time < 1 ? 1 : sleep_time ))
+done

@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+theme=$(cat "$HOME/.config/i3/.theme")
+
+show_menu() {
+    local launcher_file="$HOME/.config/i3/polybar/themes/$theme/rofi/launcher.rasi"
+    local options=(
+        "docky" "forest" "grayblocks" "hack" "material" "exit"
+    )
+    local selection
+    if [[ -f "$launcher_file" ]]; then
+        selection=$(printf '%s\n' "${options[@]}" | rofi -dmenu -p "Polybar Theme Options:" -theme "$launcher_file")
+    else
+        selection=$(printf '%s\n' "${options[@]}" | rofi -dmenu -p "Polybar Theme Options:")
+    fi
+
+    if [[ -z "$selection" || "$selection" == "exit" ]]; then
+        exit 0
+    else
+        ~/.config/i3/polybar/launch --$selection
+    fi
+}
+
+# Call the show_menu function to display the Rofi menu
+show_menu

@@ -1,7 +1,9 @@
 #!/bin/bash
-if pgrep -x "picom" > /dev/null
-then
-	killall picom
+
+if pgrep -x "picom" > /dev/null; then
+    killall picom
+    dunstify "picom - disabled"
 else
-	picom -b --config ~/.config/i3/config.d/picom.conf
+    picom -b --config ~/.config/i3/config.d/picom.conf
+    dunstify "picom - enabled"
 fi

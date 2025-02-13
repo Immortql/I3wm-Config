@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 
-#################################
-# Created by: Cadehlinha        #
-# https://github.com/Cadehlinha #
-#################################
+theme=$(cat "$HOME/.config/i3/.theme")
 
 show_menu() {
+    local launcher_file="$HOME/.config/i3/polybar/themes/$theme/rofi/launcher.rasi"
     local options=("Take screenshot now" "Schedule screenshot in 5 seconds" "Take screenshot of selected area" "Take screenshot of active window" "Exit")
-    local selection=$(printf '%s\n' "${options[@]}" | rofi -dmenu -p "Screenshot Options:" -format i -theme ~/.config/i3/polybar/scripts/rofi/launcher.rasi)
+    local selection
+    if [[ -f "$launcher_file" ]]; then
+        selection=$(printf '%s\n' "${options[@]}" | rofi -dmenu -p "Screenshot Options:" -format i -theme "$launcher_file")
+    else
+        selection=$(printf '%s\n' "${options[@]}" | rofi -dmenu -p "Screenshot Options:" -format i)
+    fi
+
     case $selection in
         0)
             ~/.config/i3/scripts/screenshot --now

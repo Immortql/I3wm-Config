@@ -1,0 +1,28 @@
+#!/bin/bash
+
+
+#####################################################################################
+#  Allows you to list various info to input into the polybar module configurations  #
+#  Since these bits of info are not static across all systems                       #
+#####################################################################################
+
+
+# Temperature sensors
+for i in /sys/class/hwmon/hwmon*/temp*_input; do
+    echo "$(cat "$(dirname "$i")/name"): $(cat "${i%_*}_label" 2>/dev/null || echo "$(basename "${i%_*}")") $(readlink -f "$i")"
+done
+
+# Batteries
+for battery in /sys/class/power_supply/BAT*; do
+    echo "Battery: $(basename "$battery")"
+done
+
+# Adapters
+for adapter in /sys/class/power_supply/AC*; do
+    echo "Adapter: $(basename "$adapter")"
+done
+
+# Backlight cards
+for card in /sys/class/backlight/*; do
+    echo "Backlight card: $(basename "$card")"
+done

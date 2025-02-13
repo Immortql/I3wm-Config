@@ -1,0 +1,30 @@
+#!/bin/sh
+
+function run {
+  if ! pgrep -x $(basename $1 | head -c 15) 1>/dev/null;
+  then
+    $@&
+  fi
+}
+
+# Run polkit authentication if it exists (you can choose whichever you want, only use one)
+#run /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+run /usr/lib/polkit-kde-authentication-agent-1
+
+# Configure displays - set variables as needed
+run xrandr --output DisplayPort-1 --primary
+run xrandr --output HDMI-A-0 --left-of DisplayPort-1
+
+# For laptop batteries
+#run ~/.config/i3/scripts/battery
+
+run dunst -config ~/.config/i3/dunst/dunstrc
+run ~/.config/i3/scripts/wallpaper ~/.config/i3/wallpapers/ --bg-scale
+
+# Start bar
+theme_dir=$(cat "$HOME/.config/i3/.theme")
+run ~/.config/i3/polybar/launch --$theme_dir
+run ~/.config/i3/scripts/picom-toggle
+
+# stop with that god damned bell sound! 3:<
+run xset b off

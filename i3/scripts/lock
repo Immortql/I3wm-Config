@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-#################################
-# Created by: Cadehlinha        #
-# https://github.com/Cadehlinha #
-#################################
-
 main() {
   local lock_img="$1"
   local snapshot_cmd="$2"
@@ -18,7 +13,7 @@ main() {
   trap cleanup EXIT
 
   check_dependencies() {
-    local dependencies=("scrot" "convert" "i3lock")
+    local dependencies=("maim" "magick" "i3lock" "dunstctl")
     local missing_dependencies=()
 
     for dep in "${dependencies[@]}"; do
@@ -35,16 +30,32 @@ main() {
 
   check_dependencies
 
+  # Pause Dunst notifications
+  dunstctl set-paused true
+  amixer set Master mute
+
   $snapshot_cmd
-  convert "$lock_img" -scale "$down_scale_factor" -scale "$up_scale_factor" "$lock_img"
+  magick "$lock_img" -scale "$down_scale_factor" -scale "$up_scale_factor" "$lock_img"
+
+  # Lock the screen
   i3lock -i "$lock_img"
-  rm $lock_img
+
+  # Wait for i3lock to exit
+  while pgrep -x i3lock >/dev/null; do
+    sleep 1
+  done
+
+  # Resume Dunst notifications
+  dunstctl set-paused false
+  amixer set Master unmute
+
+  rm "$lock_img"
 }
 
 # Define the variables
 LOCK_IMG=/tmp/lock.png
-SNAPSHOT_CMD="scrot $LOCK_IMG"
-DOWN_SCALE_FACTOR="10%" 
+SNAPSHOT_CMD="maim $LOCK_IMG"
+DOWN_SCALE_FACTOR="10%"
 UP_SCALE_FACTOR="1000%"
 
 # Call the main function with the necessary variables

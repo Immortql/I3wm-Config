@@ -1,10 +1,5 @@
 #!/bin/bash
 
-#########################################
-# Created by: Cadehlinha                #
-# Github: https://github.com/Cadehlinha #
-#########################################
-
 # Check if the video file argument is provided
 if [ -z "$1" ]; then
     echo "Missing mp4 file path"

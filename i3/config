@@ -1,6 +1,5 @@
 include ~/.config/i3/config.d/workspaces.conf
 include ~/.config/i3/config.d/keybinds.conf
-include ~/.config/i3/config.d/bar.conf
 
 ####################
 # Define Constants #
@@ -9,6 +8,9 @@ include ~/.config/i3/config.d/bar.conf
 # Set mod key vars
 set $mod Mod4
 set $alt Mod1
+
+set $firstmon DisplayPort-1
+set $secondmon HDMI-A-0
 
 # Set application defaults
 set $terminal xfce4-terminal
@@ -40,5 +42,6 @@ client.unfocused	    	$darkblue	$darkblue	$grey	$darkgrey	  $darkgrey
 client.focused_inactive		$darkblue	$darkblue	$grey	$black		  $black
 client.urgent		    	$urgentred	$urgentred	$white	$yellowbrown  $yellowbrown
 
-exec_always --no-startup-id autotiling
-exec --no-startup-id ~/.config/i3/autostart.sh
+exec_always --no-startup-id ~/.config/i3/scripts/autotiling/main.py
+exec --no-startup-id ~/.config/i3/scripts/idle-suspend
+exec --no-startup-id ~/.config/i3/autostart

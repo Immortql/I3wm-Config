@@ -1,13 +1,8 @@
 #!/bin/bash
 
-#################################
-# Created by: Cadehlinha        #
-# https://github.com/Cadehlinha #
-#################################
-
 # Check if feh is installed
 command -v feh >/dev/null 2>&1 || { echo >&2 "feh is required but not installed. Aborting."; exit 1; }
-command -v convert >/dev/null 2>&1 || { echo >&2 "ImageMagick is required but not installed. Aborting."; exit 1; }
+command -v magick >/dev/null 2>&1 || { echo >&2 "ImageMagick is required but not installed. Aborting."; exit 1; }
 
 # Check if folder path is provided
 if [ $# -eq 0 ]; then
@@ -53,7 +48,7 @@ feh "$feh_option" "$random_image"
 if [ "$resize" = true ]; then
   temp_image="/tmp/wallpaper_temp.$(date +%s).jpg"
   screen_resolution=$(xrandr --query | awk '/\*/ {print $1}')
-  convert "$random_image" -resize "$screen_resolution^" -gravity center -extent "$screen_resolution" "$temp_image"
+  magick "$random_image" -resize "$screen_resolution^" -gravity center -extent "$screen_resolution" "$temp_image"
   feh "$feh_option" "$temp_image"
   sleep 2  # Wait for 2 seconds to ensure the wallpaper is set before deleting the temporary image
   rm "$temp_image"
